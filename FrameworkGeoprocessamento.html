@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Framework de Geoprocessamento</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css" />
+
+    <style>
+      html, body, #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+      }
+
+      #toggleBasemap, #togglePrint {
+        position: absolute;
+        top: 2%;
+        left: 4%;
+        width: 5%;
+        z-index: 999;
+        padding: 5px;
+        background-color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      #togglePrint {
+        top: 7%;
+      }
+      #toggleBasemap:hover, #togglePrint:hover {
+        background-color: whitesmoke;
+      }
+
+      #credit {
+        position: absolute;
+        align-self: center;
+        bottom: -0.5%;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 999;
+        text-align: center;
+        font-size: 0.8em;
+      }
+
+    </style>
+
+    <script src="https://js.arcgis.com/4.27/"></script>
+    <script>
+      require(["esri/views/MapView", "esri/WebMap", "esri/widgets/Print", "esri/widgets/Search", "esri/widgets/LayerList", "esri/widgets/Legend", "esri/widgets/ScaleBar", "esri/widgets/Measurement", "esri/widgets/BasemapGallery"], 
+      function(MapView, WebMap, Print, Search, LayerList, Legend, ScaleBar, Measurement, BasemapGallery) {
+        var webmap = new WebMap({
+          portalItem: {
+            id: "90ffc535542641e19391ca8397ef0fe9"
+          }
+        });
+
+        var view = new MapView({
+          container: "viewDiv",
+          map: webmap
+        });
+
+        // Adicione os widgets
+        var searchWidget = new Search({
+          view: view
+        });
+
+        var measurementWidget = new Measurement({
+          view: view
+        });
+
+        var layerListWidget = new LayerList({
+          view: view
+        });
+
+        var legendWidget = new Legend({
+          view: view
+        });
+
+        var basemapGalleryWidget = new BasemapGallery({
+          view: view
+        });
+
+        var scaleBarWidget = new ScaleBar({
+          view: view
+        });
+
+        var printWidget;
+        var basemapGalleryWidget;
+
+        // Função para alternar a visibilidade do widget de impressão
+        function togglePrintWidget() {
+          if (!printWidget) {
+            printWidget = new Print({
+              view: view,
+              // Especifique seu próprio serviço de impressão
+              printServiceUrl:
+                "https://utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+            });
+            view.ui.add(printWidget, "bottom-left");
+          } else {
+            view.ui.remove(printWidget);
+            printWidget = null;
+          }
+        }
+
+        function toggleBasemapWidget() {
+          if (!basemapGalleryWidget) {
+            basemapGalleryWidget = new BasemapGallery({
+              view: view,
+            });
+            view.ui.add(basemapGalleryWidget, "bottom-left");
+          }else {
+            view.ui.remove(basemapGalleryWidget);
+            basemapGalleryWidget = null;
+          }
+        }
+
+        // Adicione os widgets de forma condicional
+        view.ui.add(searchWidget, "top-left");
+        view.ui.add(layerListWidget, "top-right");
+        view.ui.add(legendWidget, "top-right");
+        
+        view.ui.add(scaleBarWidget, "bottom-right");
+        view.ui.add(measurementWidget, "bottom-right");
+
+        // Botão para alternar o widget de impressão
+        const togglePrintButton = document.createElement("button");
+        togglePrintButton.innerHTML = "Imprimir";
+        togglePrintButton.id = "togglePrint";
+        togglePrintButton.addEventListener("click", togglePrintWidget);
+        view.ui.add(togglePrintButton, "manual");
+
+        // Botão para alternar o widget de basemap
+        const toggleBasemapButton = document.createElement("button");
+        toggleBasemapButton.innerHTML = "Basemap";
+        toggleBasemapButton.id = "toggleBasemap";
+        toggleBasemapButton.addEventListener("click", toggleBasemapWidget);
+        view.ui.add(toggleBasemapButton, "manual");
+
+      });
+    </script>
+  </head>
+
+  <body class="calcite">
+  <div id="viewDiv"></div>
+  <div id="credit">Gustavo Silvestre e Larissa Valadares</div>
+  </body>
+</html>
